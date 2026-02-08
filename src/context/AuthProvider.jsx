@@ -20,10 +20,27 @@ export function AuthProvider({ children }) {
     fetchUser();
   }, []);
 
+  async function signup({ email, password }) {
+    try {
+      await authApi.signup(email, password);
+      await login(email, password); // auto login
+    } catch (err) {
+      throw err.response?.data || { detail: "Signup failed" };
+    }
+  }
+
   async function login(email, password) {
     await authApi.login(email, password);
     const res = await authApi.getCurrentUser();
     setUser(res.data);
+  }
+
+  async function logout() {
+    try {
+      await authApi.logout();
+    } finally {
+      setUser(null);
+    }
   }
 
   return (
@@ -31,7 +48,9 @@ export function AuthProvider({ children }) {
       value={{
         user,
         loading,
+        signup,
         login,
+        logout,
       }}
     >
       {children}
