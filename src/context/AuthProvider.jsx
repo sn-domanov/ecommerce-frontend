@@ -43,6 +43,14 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function resetPassword(email) {
+    await authApi.resetPassword(email);
+  }
+
+  async function resetPasswordConfirm(data) {
+    await authApi.resetPasswordConfirm(data);
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -51,6 +59,8 @@ export function AuthProvider({ children }) {
         signup,
         login,
         logout,
+        resetPassword,
+        resetPasswordConfirm,
       }}
     >
       {children}
