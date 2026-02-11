@@ -49,18 +49,19 @@ The frontend uses cookie-based JWT authentication.
 
 - Access and refresh tokens are stored in HttpOnly cookies, preventing JavaScript access and reducing XSS risk
 - Refresh tokens are rotated and blacklisted on each access token refresh
-- Refresh tokens are blacklisted and auth cookies are deleted on logout
+- Refresh tokens are blacklisted and auth cookies are deleted on logout (available via the button in the navbar)
 - CSRF protection is handled by the backend
 
-### Authentication endpoints
+Signed up users are inactive by default, and cannot authenticate without activating their accounts (HTTP 401 Unauthorized is raised).
 
-| Action                       | Endpoint                              | Purpose                                        |
-| ---------------------------- | ------------------------------------- | -----------------------------------------------|
-| Sign up                      | `/auth/users/`                        | Create a new user                              |
-| Login                        | `/auth/jwt/create/`                   | Set `access_token` and `refresh_token` cookies |
-| Logout                       | `/auth/jwt/logout/`                   | Clear auth cookies, blacklist refresh token    |
-| Fetch current user           | `/auth/users/me/`                     | Retrieve the currently authenticated user      |
-| Request password reset email | `/auth/users/reset_password/`         | Send a password reset email                    |
-| Confirm password reset       | `/auth/users/reset_password_confirm/` | Set a new password                             |
+### Frontend routes
 
-Users are active by default (no email activation)
+| Page / Action                  | Route                                  | Purpose                                        |
+| ------------------------------ | -------------------------------------- | ---------------------------------------------- |
+| Home                           | `/`                                    | Home page                                      |
+| Sign up                        | `/signup`                              | Create a new user                              |
+| Check email / resend link      | `/check-email`                         | Inform user to check email, resend activation  |
+| Activate account               | `/activate/:uid/:token`                | Activate a user account via link               |
+| Login                          | `/login`                               | Authenticate user and set auth cookies         |
+| Reset password request         | `/reset-password`                      | Request a password reset email                 |
+| Reset password confirmation    | `/reset-password/confirm/:uid/:token`  | Set a new password via link                    |

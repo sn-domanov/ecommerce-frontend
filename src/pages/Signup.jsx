@@ -25,9 +25,7 @@ export default function Signup() {
   async function onSubmit({ email, password }) {
     try {
       await signup({ email, password });
-      // TODO replace with a message
-      alert("Account created! You will be logged in automatically.");
-      navigate("/");
+      navigate("/check-email", { state: { email } });
     } catch (err) {
       // Map Djoser field errors to form inputs
       for (const key in err) {

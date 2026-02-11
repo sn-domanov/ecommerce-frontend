@@ -14,6 +14,19 @@ export function signup(email, password) {
   });
 }
 
+export function activateAccount({ uid, token }) {
+  return apiClient.post("/auth/users/activation/", {
+    uid,
+    token,
+  });
+}
+
+export function resendActivation(email) {
+  return apiClient.post("/auth/users/resend_activation/", {
+    email,
+  });
+}
+
 export function login(email, password) {
   return apiClient.post("/auth/jwt/create/", { email, password });
 }

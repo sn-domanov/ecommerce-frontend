@@ -7,6 +7,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ResetPassword from "./pages/ResetPassword";
 import ResetPasswordConfirm from "./pages/ResetPasswordConfirm";
+import CheckEmail from "./pages/CheckEmail";
+import ActivateAccount from "./pages/ActivateAccount";
 
 function App() {
   return (
@@ -15,8 +17,10 @@ function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/check-email" element={<CheckEmail />} />
+            <Route path="/activate/:uid/:token" element={<ActivateAccount />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route
               path="/reset-password/confirm/:uid/:token"

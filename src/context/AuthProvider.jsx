@@ -23,9 +23,27 @@ export function AuthProvider({ children }) {
   async function signup({ email, password }) {
     try {
       await authApi.signup(email, password);
-      await login(email, password); // auto login
     } catch (err) {
       throw err.response?.data || { detail: "Signup failed" };
+    }
+  }
+
+  async function activateAccount(data) {
+    try {
+      await authApi.activateAccount(data);
+    } catch (err) {
+      // Normalize errors. Guarantee err.detail in the page.
+      const detail = err?.response?.data?.detail || "Activation failed";
+      throw { detail };
+    }
+  }
+
+  async function resendActivation(email) {
+    try {
+      await authApi.resendActivation(email);
+    } catch (err) {
+      const detail = err?.response?.data?.detail || "Failed to resend email";
+      throw { detail };
     }
   }
 
@@ -57,6 +75,8 @@ export function AuthProvider({ children }) {
         user,
         loading,
         signup,
+        activateAccount,
+        resendActivation,
         login,
         logout,
         resetPassword,
