@@ -17,8 +17,19 @@ export default function ResetPassword() {
     try {
       await resetPassword(email);
       alert("Check your email for reset instructions");
-    } catch {
-      setError("root", { message: "Failed to send reset email" });
+    } catch (err) {
+      if (err.detail) {
+        // err.detail is mutually exclusive with field errors
+        setError("root", { message: err.detail });
+        return;
+      }
+
+      // Handle field-level errors
+      Object.entries(err).forEach(([field, messages]) => {
+        if (Array.isArray(messages)) {
+          setError(field, { message: messages.join(" ") });
+        }
+      });
     }
   }
 

@@ -27,14 +27,18 @@ export default function Signup() {
       await signup({ email, password });
       navigate("/check-email", { state: { email } });
     } catch (err) {
-      // Map Djoser field errors to form inputs
-      for (const key in err) {
-        if (Array.isArray(err[key])) {
-          setError(key, { message: err[key].join(" ") });
-        } else if (err.detail) {
-          setError("root", { message: err.detail });
-        }
+      if (err.detail) {
+        // err.detail is mutually exclusive with field errors
+        setError("root", { message: err.detail });
+        return;
       }
+
+      // Handle field-level errors
+      Object.entries(err).forEach(([field, messages]) => {
+        if (Array.isArray(messages)) {
+          setError(field, { message: messages.join(" ") });
+        }
+      });
     }
   }
 

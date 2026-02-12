@@ -20,8 +20,9 @@ export default function Login() {
       // Perform login (sets HttpOnly cookies)
       await login(email, password);
       navigate("/");
-    } catch {
-      setError("root", { message: "Invalid email or password" });
+    } catch (err) {
+      // Generic "Invalid email or password" only
+      setError("root", { message: err.detail });
     }
   }
 

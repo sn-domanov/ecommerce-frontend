@@ -33,10 +33,18 @@ export default function ResetPasswordConfirm() {
 
       alert("Password reset successful. You can now log in.");
       navigate("/login");
-    } catch {
-      setError("root", {
-        message:
-          "Invalid or expired reset link. Please request a new password reset.",
+    } catch (err) {
+      if (err.detail) {
+        // err.detail is mutually exclusive with field errors
+        setError("root", { message: err.detail });
+        return;
+      }
+
+      // Handle field-level errors
+      Object.entries(err).forEach(([field, messages]) => {
+        if (Array.isArray(messages)) {
+          setError(field, { message: messages.join(" ") });
+        }
       });
     }
   }
