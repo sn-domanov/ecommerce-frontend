@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useForm, useWatch } from "react-hook-form";
 import { useState } from "react";
 import { useAuth } from "../context/useAuth";
@@ -7,7 +7,6 @@ import FormInput from "../components/FormInput";
 
 export default function ResetPasswordConfirm() {
   const { uid, token } = useParams();
-  const navigate = useNavigate();
 
   const { resetPasswordConfirm } = useAuth();
   const [successMessage, setSuccessMessage] = useState(null);
@@ -38,7 +37,6 @@ export default function ResetPasswordConfirm() {
       });
 
       setSuccessMessage("Password reset successful. You can now log in.");
-      navigate("/login");
     } catch (err) {
       if (err.detail) {
         // err.detail is mutually exclusive with field errors
