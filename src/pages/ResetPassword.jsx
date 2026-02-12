@@ -1,24 +1,43 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/useAuth";
+import { useState } from "react";
 import FormCard from "../components/FormCard";
 import FormInput from "../components/FormInput";
 
 export default function ResetPassword() {
   const { resetPassword } = useAuth();
 
+  const [successMessage, setSuccessMessage] = useState(null);
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
+    clearErrors,
   } = useForm();
 
   async function onSubmit({ email }) {
     try {
+      setSuccessMessage(null);
+      clearErrors();
+
       await resetPassword(email);
-      alert("Check your email for reset instructions");
-    } catch {
-      setError("root", { message: "Failed to send reset email" });
+
+      setSuccessMessage("Check your email for reset instructions");
+    } catch (err) {
+      if (err.detail) {
+        // err.detail is mutually exclusive with field errors
+        setError("root", { message: err.detail });
+        return;
+      }
+
+      // Handle field-level errors
+      Object.entries(err).forEach(([field, messages]) => {
+        if (Array.isArray(messages)) {
+          setError(field, { message: messages.join(" ") });
+        }
+      });
     }
   }
 
@@ -32,9 +51,19 @@ export default function ResetPassword() {
           type="email"
           placeholder="Email"
           autoComplete="email"
-          register={register("email", { required: "Email is required" })}
+          register={register("email", {
+            required: "Email is required",
+            onChange: () => {
+              setSuccessMessage(null);
+              clearErrors();
+            },
+          })}
           error={errors.email}
         />
+
+        {successMessage && (
+          <div className="alert alert-success py-2">{successMessage}</div>
+        )}
 
         {errors.root && (
           <div className="alert alert-danger py-2">{errors.root.message}</div>

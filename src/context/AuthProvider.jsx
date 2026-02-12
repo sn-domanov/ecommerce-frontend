@@ -2,6 +2,17 @@ import { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import * as authApi from "../api/auth";
 
+function normalizeError(err, fallbackMessage) {
+  // Guarantee data object in pages
+  const data = err?.response?.data;
+
+  if (data && typeof data === "object") {
+    return data;
+  }
+
+  return { detail: fallbackMessage };
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,7 +35,7 @@ export function AuthProvider({ children }) {
     try {
       await authApi.signup(email, password);
     } catch (err) {
-      throw err.response?.data || { detail: "Signup failed" };
+      throw normalizeError(err, "Signup failed");
     }
   }
 
@@ -32,9 +43,7 @@ export function AuthProvider({ children }) {
     try {
       await authApi.activateAccount(data);
     } catch (err) {
-      // Normalize errors. Guarantee err.detail in the page.
-      const detail = err?.response?.data?.detail || "Activation failed";
-      throw { detail };
+      throw normalizeError(err, "Activation failed");
     }
   }
 
@@ -42,18 +51,22 @@ export function AuthProvider({ children }) {
     try {
       await authApi.resendActivation(email);
     } catch (err) {
-      const detail = err?.response?.data?.detail || "Failed to resend email";
-      throw { detail };
+      throw normalizeError(err, "Failed to resend email");
     }
   }
 
   async function login(email, password) {
-    await authApi.login(email, password);
-    const res = await authApi.getCurrentUser();
-    setUser(res.data);
+    try {
+      await authApi.login(email, password);
+      const res = await authApi.getCurrentUser();
+      setUser(res.data);
+    } catch {
+      throw { detail: "Invalid email or password" };
+    }
   }
 
   async function logout() {
+    // Logout should never fail
     try {
       await authApi.logout();
     } finally {
@@ -62,11 +75,22 @@ export function AuthProvider({ children }) {
   }
 
   async function resetPassword(email) {
-    await authApi.resetPassword(email);
+    try {
+      await authApi.resetPassword(email);
+    } catch (err) {
+      throw normalizeError(err, "Failed to send reset email");
+    }
   }
 
   async function resetPasswordConfirm(data) {
-    await authApi.resetPasswordConfirm(data);
+    try {
+      await authApi.resetPasswordConfirm(data);
+    } catch (err) {
+      throw normalizeError(
+        err,
+        "Invalid or expired reset link. Please request a new password reset.",
+      );
+    }
   }
 
   return (

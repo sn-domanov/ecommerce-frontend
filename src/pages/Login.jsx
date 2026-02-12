@@ -13,15 +13,19 @@ export default function Login() {
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
+    clearErrors,
   } = useForm();
 
   async function onSubmit({ email, password }) {
     try {
+      clearErrors();
+
       // Perform login (sets HttpOnly cookies)
       await login(email, password);
       navigate("/");
-    } catch {
-      setError("root", { message: "Invalid email or password" });
+    } catch (err) {
+      // Generic "Invalid email or password" only
+      setError("root", { message: err.detail });
     }
   }
 
@@ -34,6 +38,9 @@ export default function Login() {
           autoComplete="email"
           register={register("email", {
             required: "Email is required",
+            onChange: () => {
+              clearErrors();
+            },
           })}
           error={errors.email}
         />
@@ -45,6 +52,9 @@ export default function Login() {
           register={register("password", {
             required: "Password is required",
             minLength: { value: 6, message: "Minimum 6 characters" },
+            onChange: () => {
+              clearErrors();
+            },
           })}
           error={errors.password}
         />
